@@ -1,0 +1,17 @@
+Facts:
+The dispute arose after Harbor Analytics LLC sued former employee Daniel Brooks in federal district court in Illinois, alleging that Brooks copied internal pricing models before joining a competitor. Harbor sought an injunction and damages under the Defend Trade Secrets Act and related state-law claims.
+
+Issue:
+The central issue on appeal was whether the district court properly denied a preliminary injunction on the ground that Harbor had not shown irreparable harm.
+
+Arguments:
+Harbor argued that the district court undervalued the risk of ongoing competitive injury and ignored evidence that Brooks retained confidential spreadsheets. Brooks responded that the files were never used in the new role, that the employer delayed filing suit for several months, and that any injury could be remedied through money damages.
+
+Statute:
+The panel discussed the Defend Trade Secrets Act, 18 U.S.C. Section 1836, and Seventh Circuit precedent describing irreparable harm as a necessary element for preliminary injunctive relief.
+
+Analysis:
+The court explained that a plaintiff seeking extraordinary equitable relief must present concrete evidence of a non-compensable injury, not merely a generalized fear of competition. Although Harbor identified suspicious downloads, the record contained no proof that Brooks had disclosed or deployed the alleged trade secrets. The panel also noted that Harbor’s delay in seeking emergency relief weakened its assertion that immediate judicial intervention was necessary.
+
+Ruling:
+The denial of a preliminary injunction was affirmed. The court held that Harbor had shown a serious dispute on the merits but failed to establish irreparable harm on the present record.

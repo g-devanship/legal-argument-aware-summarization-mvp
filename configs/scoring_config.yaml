@@ -1,0 +1,24 @@
+weights:
+  semantic_similarity: 0.38
+  role_coverage: 0.26
+  factual_proxy: 0.20
+  redundancy_penalty: 1.0
+  length_penalty: 1.0
+  readability_bonus: 0.08
+
+role_importance:
+  facts: 0.14
+  issue: 0.14
+  arguments: 0.14
+  analysis: 0.20
+  ruling: 0.24
+  statute: 0.10
+  other: 0.04
+
+thresholds:
+  min_summary_words: 90
+  max_summary_words: 260
+  ideal_summary_words: 170
+  redundancy_ngram_size: 3
+  readability_sentence_min: 10
+  readability_sentence_max: 32

@@ -1,0 +1,14 @@
+[
+  {
+    "document_id": "indian_demo_001",
+    "document_text": "Facts: The petitioner challenged cancellation of a housing allotment. Issue: Whether the authority could cancel the allotment without notice. Arguments: The petitioner argued that natural justice required a hearing, while the authority argued that the allotment was conditional. Analysis: The court reasoned that Article 14 required fair procedure before cancellation of a vested benefit. Ruling: The cancellation order was set aside and remanded for fresh consideration.",
+    "gold_summary": "The High Court held that cancellation of the petitioner’s housing allotment without notice violated procedural fairness. It set aside the order and remanded the matter for a fresh hearing.",
+    "jurisdiction": "India"
+  },
+  {
+    "document_id": "us_demo_001",
+    "document_text": "Facts: Harbor Analytics sued a former employee for taking pricing models. Issue: Whether a preliminary injunction was wrongly denied. Arguments: Harbor claimed ongoing trade-secret harm, while the employee argued that any injury was compensable. Analysis: The court found no concrete showing of irreparable harm and noted the employer’s delay. Ruling: The denial of a preliminary injunction was affirmed.",
+    "gold_summary": "The appellate court affirmed denial of a preliminary injunction because the employer failed to show irreparable harm despite evidence of a trade-secret dispute.",
+    "jurisdiction": "United States"
+  }
+]

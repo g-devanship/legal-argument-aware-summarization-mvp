@@ -1,0 +1,17 @@
+Facts:
+The petitioner, Meera Rao, challenged the cancellation of a public housing allotment made by the Municipal Development Authority in Bengaluru. The authority had allotted a small residential plot to her in 2018 under a rehabilitation scheme for displaced street vendors. In 2022, the allotment was cancelled after an internal audit stated that the petitioner had failed to submit a final occupancy certificate within the prescribed period.
+
+Issue:
+The principal question before the High Court was whether the authority could cancel the allotment without issuing a prior show-cause notice and without considering the petitioner’s explanation that construction had been delayed by a lockdown order and repeated flooding in the area.
+
+Arguments:
+Counsel for the petitioner argued that the cancellation violated principles of natural justice because no meaningful hearing was given. It was further submitted that Clause 14 of the rehabilitation scheme required the authority to issue notice and record reasons before resuming possession. Counsel for the authority contended that the allotment was conditional, that the petitioner remained in breach for more than twelve months, and that prompt cancellation was necessary to preserve limited public resources.
+
+Statute:
+The court considered Article 14 of the Constitution of India and Section 21 of the General Clauses Act, together with Clause 14 of the rehabilitation scheme. The court also referred to prior precedent requiring administrative agencies to provide fair notice where cancellation affects civil consequences.
+
+Analysis:
+The court observed that even where an allotment is conditional, an administrative body must act fairly when withdrawing a vested benefit. Because the petitioner had disclosed repeated requests for extension and because the authority’s own records reflected severe weather disruption, the failure to issue notice deprived the petitioner of an opportunity to demonstrate substantial compliance. The court reasoned that contractual discretion under the scheme could not override the minimum procedural safeguards that flow from Article 14 when state action produces serious adverse consequences.
+
+Ruling:
+The writ petition was allowed in part. The cancellation order dated 14 July 2022 was set aside, and the matter was remanded to the authority for fresh consideration after issuing notice and granting a hearing within six weeks. The court clarified that it expressed no final opinion on the petitioner’s entitlement to permanent allotment.

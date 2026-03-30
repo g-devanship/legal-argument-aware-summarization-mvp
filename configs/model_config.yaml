@@ -1,0 +1,36 @@
+runtime:
+  device: cpu
+  local_files_only: false
+  load_models: true
+  use_heuristics_only: false
+  random_seed: 42
+
+summarization:
+  preferred_model: allenai/led-base-16384
+  fallback_model: facebook/bart-large-cnn
+  lightweight_model: google/flan-t5-base
+  encoder_max_input_tokens: 4096
+  chunk_max_words: 850
+  chunk_overlap_words: 120
+  min_summary_tokens: 80
+  max_summary_tokens: 220
+  candidate_count: 5
+
+roles:
+  preferred_model: law-ai/InLegalBERT
+  alternative_model: nlpaueb/legal-bert-base-uncased
+  lightweight_model: distilbert-base-uncased
+  fine_tuned_checkpoint: null
+  max_length: 256
+  top_k: 3
+  hybrid_heuristic_weight: 0.35
+
+embeddings:
+  model_name: sentence-transformers/all-MiniLM-L6-v2
+
+training:
+  output_dir: data/processed/role_classifier
+  batch_size: 4
+  learning_rate: 2.0e-5
+  num_train_epochs: 2
+  warmup_ratio: 0.1

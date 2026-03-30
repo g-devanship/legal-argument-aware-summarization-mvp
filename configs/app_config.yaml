@@ -1,0 +1,31 @@
+data:
+  paragraph_min_chars: 30
+  sentence_min_chars: 10
+  rhetorical_unit_segmentation: true
+  normalize_headers: true
+
+api:
+  host: 0.0.0.0
+  port: 8000
+  title: Legal Argument-Aware Summarization MVP
+  version: 0.1.0
+
+ui:
+  page_title: Legal Summarization MVP
+  layout: wide
+
+auth:
+  enabled: true
+  users_db_path: data/processed/app_users.db
+  min_password_length: 8
+
+generation:
+  strategies:
+    - baseline_full_document
+    - role_focus_facts_issue_ruling
+    - analysis_heavy
+    - chunk_merge_conservative
+    - chunk_merge_diverse
+
+explainability:
+  supporting_segment_count: 5
