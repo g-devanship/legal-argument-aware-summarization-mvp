@@ -537,6 +537,161 @@ def render_summary_panel(result: Dict[str, Any]) -> None:
     )
 
 
+def render_primary_result_view(result: Dict[str, Any]) -> None:
+    runtime_info = result.get("runtime_info", {})
+    qualitative = result.get("qualitative_analysis", {})
+    evaluation = result.get("evaluation")
+    candidates = result.get("generated_summary_candidates", [])
+    scores = result.get("reranking_scores", [])
+    score_map = {score["candidate_id"]: score for score in scores}
+    best_score = score_map.get(result.get("best_candidate_id"), {})
+
+    summary_metrics = [
+        ("Best Candidate", result.get("best_candidate_id") or "-", "Top-ranked summary candidate"),
+        ("Summary Words", str(len(result.get("best_summary", "").split())), "Length of the selected summary"),
+        ("Candidates", str(len(candidates)), "Generated before reranking"),
+        ("Reranker Score", f"{best_score.get('final_score', 0.0):.3f}", "Final weighted selection score"),
+    ]
+    summary_metric_columns = st.columns(4)
+    for column, (label, value, subtext) in zip(summary_metric_columns, summary_metrics):
+        with column:
+            render_metric_card(label, value, subtext)
+
+    render_summary_panel(result)
+
+    st.markdown('<div class="glass-panel">', unsafe_allow_html=True)
+    st.markdown('<div class="small-heading">Why This Summary Was Selected</div>', unsafe_allow_html=True)
+    reasons = qualitative.get("selection_explanation", [])
+    if reasons:
+        for reason in reasons:
+            st.write(f"- {reason}")
+    else:
+        st.caption("No additional reranking explanation was available for this run.")
+    if runtime_info:
+        render_backend_chips(runtime_info)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    if evaluation:
+        st.markdown('<div class="glass-panel">', unsafe_allow_html=True)
+        st.markdown('<div class="small-heading">Evaluation</div>', unsafe_allow_html=True)
+        eval_cols = st.columns(3)
+        with eval_cols[0]:
+            st.metric("ROUGE-1", f"{evaluation['rouge_1']:.3f}")
+        with eval_cols[1]:
+            st.metric("ROUGE-2", f"{evaluation['rouge_2']:.3f}")
+        with eval_cols[2]:
+            st.metric("ROUGE-L", f"{evaluation['rouge_l']:.3f}")
+        if evaluation.get("bertscore_f1") is not None:
+            st.metric("BERTScore F1", f"{evaluation['bertscore_f1']:.3f}")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    supporting_segments = qualitative.get("key_legal_segments", [])
+    if supporting_segments:
+        with st.expander("View Supporting Legal Segments", expanded=False):
+            st.markdown("These source segments were most aligned with the selected summary.")
+            for segment in supporting_segments:
+                st.markdown(
+                    f"""
+                    <div class="candidate-box">
+                        <div><strong>{html.escape(segment['segment_id'])}</strong> | relevance {html.escape(str(segment['score']))}</div>
+                        <div style="margin-top:0.45rem;">{html.escape(segment['text'])}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+    with st.expander("View Other Summary Candidates", expanded=False):
+        comparison_rows = []
+        for candidate in candidates:
+            score = score_map.get(candidate["candidate_id"], {})
+            comparison_rows.append(
+                {
+                    "candidate_id": candidate["candidate_id"],
+                    "method": candidate["generation_method"],
+                    "final_score": round(score.get("final_score", 0.0), 4),
+                    "semantic_similarity": round(score.get("semantic_similarity", 0.0), 4),
+                    "role_coverage": round(score.get("role_coverage", 0.0), 4),
+                }
+            )
+        st.dataframe(comparison_rows, use_container_width=True)
+
+        for candidate in candidates:
+            if candidate["candidate_id"] == result.get("best_candidate_id"):
+                continue
+            score = score_map.get(candidate["candidate_id"], {})
+            with st.expander(
+                f"{candidate['candidate_id']} | {candidate['generation_method']} | score {score.get('final_score', 0.0):.3f}",
+                expanded=False,
+            ):
+                st.markdown(
+                    f"""
+                    <div class="candidate-box">
+                        <div class="small-heading">Candidate Summary</div>
+                        <div>{html.escape(candidate['text'])}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+                reason_items = score.get("reasoning", [])
+                if reason_items:
+                    for reason in reason_items:
+                        st.write(f"- {reason}")
+
+    with st.expander("Advanced Analysis", expanded=False):
+        segmented = result.get("segmented_text", {})
+        top_row = st.columns(4)
+        advanced_metrics = [
+            ("Paragraphs", str(len(segmented.get("paragraphs", []))), "Normalized source sections"),
+            ("Sentences", str(len(segmented.get("sentences", []))), "Sentence-level segmentation"),
+            ("Rhetorical Units", str(len(segmented.get("rhetorical_units", []))), "Argument-aware units"),
+            ("Chunks", str(len(segmented.get("chunks", []))), "Long-context windows"),
+        ]
+        for column, (label, value, subtext) in zip(top_row, advanced_metrics):
+            with column:
+                render_metric_card(label, value, subtext)
+
+        role_predictions = result.get("predicted_roles", [])
+        if role_predictions:
+            available_roles = sorted({item["label"] for item in role_predictions})
+            selected_roles = st.multiselect(
+                "Filter rhetorical units by role",
+                available_roles,
+                default=available_roles,
+                key="advanced_role_filter",
+            )
+            role_badges = []
+            for role in selected_roles:
+                role_badges.append(
+                    f'<span class="role-pill" style="background:{ROLE_COLORS.get(role, "#7A7A7A")};">{html.escape(role.title())}</span>'
+                )
+            st.markdown("".join(role_badges), unsafe_allow_html=True)
+
+            unit_lookup = {segment["segment_id"]: segment for segment in segmented.get("rhetorical_units", [])}
+            filtered_rows = []
+            for prediction in role_predictions:
+                if prediction["label"] not in selected_roles:
+                    continue
+                segment = unit_lookup.get(prediction["segment_id"], {})
+                filtered_rows.append(
+                    {
+                        "segment_id": prediction["segment_id"],
+                        "role": prediction["label"],
+                        "confidence": round(prediction["confidence"], 3),
+                        "text": segment.get("text", ""),
+                        "rationale": " | ".join(prediction.get("rationale", [])),
+                    }
+                )
+            st.dataframe(filtered_rows, use_container_width=True, height=420)
+
+        candidate_comparison = qualitative.get("candidate_comparison", [])
+        if candidate_comparison:
+            st.markdown('<div class="small-heading">Candidate Comparison</div>', unsafe_allow_html=True)
+            st.dataframe(candidate_comparison, use_container_width=True)
+
+        st.markdown('<div class="small-heading">Raw Result JSON</div>', unsafe_allow_html=True)
+        st.json(result)
+
+
 def render_authenticated_workspace(pipeline: LegalSummarizationPipeline, auth_user: Dict[str, Any]) -> None:
     with st.sidebar:
         st.markdown(
@@ -671,18 +826,7 @@ def render_authenticated_workspace(pipeline: LegalSummarizationPipeline, auth_us
             "but installing local Hugging Face runtime packages and model weights will improve generation quality."
         )
 
-    metrics = [
-        ("Paragraphs", str(len(result["segmented_text"]["paragraphs"])), "Normalized source sections"),
-        ("Sentences", str(len(result["segmented_text"]["sentences"])), "Sentence-level segmentation"),
-        ("Rhetorical Units", str(len(result["segmented_text"]["rhetorical_units"])), "Argument-aware units"),
-        ("Candidates", str(len(result["generated_summary_candidates"])), "Generated before reranking"),
-    ]
-    metric_columns = st.columns(4)
-    for column, (label, value, subtext) in zip(metric_columns, metrics):
-        with column:
-            render_metric_card(label, value, subtext)
-
-    render_summary_panel(result)
+    render_primary_result_view(result)
 
     export_columns = st.columns(3)
     with export_columns[0]:
@@ -713,126 +857,6 @@ def render_authenticated_workspace(pipeline: LegalSummarizationPipeline, auth_us
             )
         else:
             st.caption("PDF export unavailable without `reportlab`.")
-
-    overview_tab, candidate_tab, role_tab, explain_tab, raw_tab = st.tabs(
-        ["Executive View", "Candidate Bench", "Role Map", "Evidence Trail", "Raw JSON"]
-    )
-
-    with overview_tab:
-        if result.get("evaluation"):
-            st.markdown('<div class="glass-panel">', unsafe_allow_html=True)
-            st.markdown('<div class="small-heading">Evaluation</div>', unsafe_allow_html=True)
-            eval_cols = st.columns(3)
-            with eval_cols[0]:
-                st.metric("ROUGE-1", f"{result['evaluation']['rouge_1']:.3f}")
-            with eval_cols[1]:
-                st.metric("ROUGE-2", f"{result['evaluation']['rouge_2']:.3f}")
-            with eval_cols[2]:
-                st.metric("ROUGE-L", f"{result['evaluation']['rouge_l']:.3f}")
-            st.markdown("</div>", unsafe_allow_html=True)
-
-        st.markdown('<div class="glass-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="small-heading">Selection Reasoning</div>', unsafe_allow_html=True)
-        for reason in result["qualitative_analysis"].get("selection_explanation", []):
-            st.write(f"- {reason}")
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    with candidate_tab:
-        comparison_rows = []
-        score_map = {score["candidate_id"]: score for score in result["reranking_scores"]}
-        for candidate in result["generated_summary_candidates"]:
-            score = score_map.get(candidate["candidate_id"], {})
-            comparison_rows.append(
-                {
-                    "candidate_id": candidate["candidate_id"],
-                    "method": candidate["generation_method"],
-                    "final_score": round(score.get("final_score", 0.0), 4),
-                    "semantic_similarity": round(score.get("semantic_similarity", 0.0), 4),
-                    "role_coverage": round(score.get("role_coverage", 0.0), 4),
-                    "factual_proxy": round(score.get("factual_proxy", 0.0), 4),
-                }
-            )
-        st.dataframe(comparison_rows, use_container_width=True)
-
-        for candidate in result["generated_summary_candidates"]:
-            score = score_map.get(candidate["candidate_id"], {})
-            with st.expander(
-                f"{candidate['candidate_id']} | {candidate['generation_method']} | score {score.get('final_score', 0.0):.3f}",
-                expanded=candidate["candidate_id"] == result["best_candidate_id"],
-            ):
-                st.markdown(
-                    f"""
-                    <div class="candidate-box">
-                        <div class="small-heading">Candidate Summary</div>
-                        <div>{html.escape(candidate['text'])}</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-                if score:
-                    score_cols = st.columns(5)
-                    metric_items = [
-                        ("Semantic", score["semantic_similarity"]),
-                        ("Role", score["role_coverage"]),
-                        ("Factual", score["factual_proxy"]),
-                        ("Redundancy", score["redundancy_penalty"]),
-                        ("Length", score["length_penalty"]),
-                    ]
-                    for column, (label, value) in zip(score_cols, metric_items):
-                        with column:
-                            st.metric(label, f"{value:.3f}")
-                    for reason in score.get("reasoning", []):
-                        st.write(f"- {reason}")
-
-    with role_tab:
-        available_roles = sorted({item["label"] for item in result["predicted_roles"]})
-        selected_roles = st.multiselect("Filter rhetorical units by role", available_roles, default=available_roles)
-        role_badges = []
-        for role in selected_roles:
-            role_badges.append(
-                f'<span class="role-pill" style="background:{ROLE_COLORS.get(role, "#7A7A7A")};">{html.escape(role.title())}</span>'
-            )
-        st.markdown("".join(role_badges), unsafe_allow_html=True)
-
-        unit_lookup = {segment["segment_id"]: segment for segment in result["segmented_text"]["rhetorical_units"]}
-        filtered_rows = []
-        for prediction in result["predicted_roles"]:
-            if prediction["label"] not in selected_roles:
-                continue
-            segment = unit_lookup.get(prediction["segment_id"], {})
-            filtered_rows.append(
-                {
-                    "segment_id": prediction["segment_id"],
-                    "role": prediction["label"],
-                    "confidence": round(prediction["confidence"], 3),
-                    "text": segment.get("text", ""),
-                    "rationale": " | ".join(prediction.get("rationale", [])),
-                }
-            )
-        st.dataframe(filtered_rows, use_container_width=True, height=470)
-
-    with explain_tab:
-        st.markdown('<div class="glass-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="small-heading">Supporting Source Segments</div>', unsafe_allow_html=True)
-        for segment in result["qualitative_analysis"].get("key_legal_segments", []):
-            st.markdown(
-                f"""
-                <div class="candidate-box">
-                    <div><strong>{html.escape(segment['segment_id'])}</strong> | relevance {html.escape(str(segment['score']))}</div>
-                    <div style="margin-top:0.45rem;">{html.escape(segment['text'])}</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        st.markdown('<div class="glass-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="small-heading">Candidate Comparison</div>', unsafe_allow_html=True)
-        st.dataframe(result["qualitative_analysis"].get("candidate_comparison", []), use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    with raw_tab:
-        st.json(result)
 
 
 def main() -> None:
