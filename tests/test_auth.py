@@ -29,6 +29,24 @@ def test_auth_rejects_duplicate_or_short_password(tmp_path):
     except AuthValidationError:
         pass
 
+
+def test_auth_persistent_session_round_trip(tmp_path):
+    auth_service = AuthService(tmp_path / "users.db", min_password_length=8)
+    user = auth_service.register_user(
+        email="persistent@example.com",
+        password="SecurePass123",
+        full_name="Persistent User",
+    )
+
+    session_token = auth_service.create_session(user.user_id, duration_days=14)
+    restored = auth_service.get_user_by_session_token(session_token)
+
+    assert restored is not None
+    assert restored.email == "persistent@example.com"
+
+    auth_service.revoke_session(session_token)
+    assert auth_service.get_user_by_session_token(session_token) is None
+
     try:
         auth_service.register_user(email="new@example.com", password="short", full_name="Short Password")
         raise AssertionError("Short password should have failed.")

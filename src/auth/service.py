@@ -6,9 +6,10 @@ import hashlib
 import hmac
 import os
 import re
+import secrets
 import sqlite3
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -40,6 +41,7 @@ class AuthService:
 
     EMAIL_PATTERN = re.compile(r"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$", flags=re.I)
     HASH_ITERATIONS = 240_000
+    SESSION_BYTES = 32
 
     def __init__(self, db_path: str | Path, min_password_length: int = 8) -> None:
         self.db_path = Path(db_path)
@@ -130,6 +132,86 @@ class AuthService:
             last_login_at=str(row["last_login_at"]) if row["last_login_at"] else None,
         )
 
+    def create_session(self, user_id: int, duration_days: int = 14) -> str:
+        """Create a persistent local session token for the given user."""
+
+        token = secrets.token_urlsafe(self.SESSION_BYTES)
+        token_hash = self._hash_session_token(token)
+        now_dt = self._now_dt()
+        now = now_dt.isoformat()
+        expires_at = (now_dt + timedelta(days=max(duration_days, 1))).isoformat()
+        with self._connect() as connection:
+            self._prune_expired_sessions(connection)
+            connection.execute(
+                """
+                INSERT INTO sessions (token_hash, user_id, created_at, expires_at, last_seen_at)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (token_hash, user_id, now, expires_at, now),
+            )
+            connection.commit()
+        LOGGER.info("Created persistent Streamlit session for user_id=%s", user_id)
+        return token
+
+    def get_user_by_session_token(self, token: str) -> Optional[AuthUser]:
+        """Return the authenticated user associated with a persistent session token."""
+
+        clean_token = token.strip()
+        if not clean_token:
+            return None
+
+        token_hash = self._hash_session_token(clean_token)
+        now_dt = self._now_dt()
+        now = now_dt.isoformat()
+        with self._connect() as connection:
+            self._prune_expired_sessions(connection)
+            row = connection.execute(
+                """
+                SELECT
+                    users.id,
+                    users.email,
+                    users.full_name,
+                    users.created_at,
+                    users.last_login_at,
+                    sessions.expires_at
+                FROM sessions
+                INNER JOIN users ON users.id = sessions.user_id
+                WHERE sessions.token_hash = ?
+                """,
+                (token_hash,),
+            ).fetchone()
+            if row is None:
+                return None
+
+            expires_at = self._parse_timestamp(str(row["expires_at"]))
+            if expires_at <= now_dt:
+                connection.execute("DELETE FROM sessions WHERE token_hash = ?", (token_hash,))
+                connection.commit()
+                return None
+
+            connection.execute("UPDATE sessions SET last_seen_at = ? WHERE token_hash = ?", (now, token_hash))
+            connection.commit()
+
+        return AuthUser(
+            user_id=int(row["id"]),
+            email=str(row["email"]),
+            full_name=str(row["full_name"]),
+            created_at=str(row["created_at"]),
+            last_login_at=str(row["last_login_at"]) if row["last_login_at"] else None,
+        )
+
+    def revoke_session(self, token: str) -> None:
+        """Invalidate a persistent session token."""
+
+        clean_token = token.strip()
+        if not clean_token:
+            return
+
+        token_hash = self._hash_session_token(clean_token)
+        with self._connect() as connection:
+            connection.execute("DELETE FROM sessions WHERE token_hash = ?", (token_hash,))
+            connection.commit()
+
     def _initialize(self) -> None:
         with self._connect() as connection:
             connection.execute(
@@ -145,6 +227,19 @@ class AuthService:
                 )
                 """
             )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS sessions (
+                    token_hash TEXT PRIMARY KEY,
+                    user_id INTEGER NOT NULL,
+                    created_at TEXT NOT NULL,
+                    expires_at TEXT NOT NULL,
+                    last_seen_at TEXT NOT NULL,
+                    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+                )
+                """
+            )
+            self._prune_expired_sessions(connection)
             connection.commit()
 
     def _connect(self) -> sqlite3.Connection:
@@ -170,5 +265,20 @@ class AuthService:
         digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, self.HASH_ITERATIONS)
         return digest.hex()
 
+    def _hash_session_token(self, token: str) -> str:
+        return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+    def _prune_expired_sessions(self, connection: sqlite3.Connection) -> None:
+        connection.execute("DELETE FROM sessions WHERE expires_at <= ?", (self._now(),))
+
+    def _parse_timestamp(self, value: str) -> datetime:
+        parsed = datetime.fromisoformat(value)
+        if parsed.tzinfo is None:
+            return parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc)
+
+    def _now_dt(self) -> datetime:
+        return datetime.now(timezone.utc)
+
     def _now(self) -> str:
-        return datetime.now(timezone.utc).isoformat()
+        return self._now_dt().isoformat()

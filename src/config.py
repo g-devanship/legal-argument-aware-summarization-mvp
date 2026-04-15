@@ -83,6 +83,8 @@ class AuthConfig(BaseModel):
     enabled: bool = True
     users_db_path: str = "data/processed/app_users.db"
     min_password_length: int = 8
+    session_cookie_name: str = "legal_summary_session"
+    session_duration_days: int = 14
 
 
 class GenerationConfig(BaseModel):

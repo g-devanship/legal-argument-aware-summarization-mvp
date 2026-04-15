@@ -18,6 +18,8 @@ auth:
   enabled: true
   users_db_path: data/processed/app_users.db
   min_password_length: 8
+  session_cookie_name: legal_summary_session
+  session_duration_days: 14
 
 generation:
   strategies:

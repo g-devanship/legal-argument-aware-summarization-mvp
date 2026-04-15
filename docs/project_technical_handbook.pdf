@@ -1,0 +1,911 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 16 /Kids [ 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R 37 0 R ] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+6 0 obj
+<< /Length 4847 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F2 22 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 788 Tm (Legal Argument-Aware Summarization MVP) Tj ET
+BT /F1 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 752 Tm (Technical handbook covering pipeline steps, candidate generation, models,) Tj ET
+BT /F1 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 736 Tm (scores, technologies, and file responsibilities.) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 704 Tm (Purpose Of This Guide) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 680 Tm (This handbook explains the complete project in one place:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 663 Tm (- what problem the system solves) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 647 Tm (- how the pipeline works from input to output) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 631 Tm (- what models and fallbacks are used) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 615 Tm (- how candidate summaries are generated) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 599 Tm (- how reranking works and what each score means) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 583 Tm (- what evaluation metrics are used and why they matter) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 567 Tm (- what technologies and libraries are used) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 551 Tm (- what each main class does) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 535 Tm (- what each file in the repository is responsible for) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 519 Tm (It is written as a technical explanation of the current codebase, not as a generic) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 505 Tm (description of legal summarization.) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 488 Tm (Project Overview) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 464 Tm (This project is a legal document summarization MVP for long court judgments and legal) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 450 Tm (opinions. It accepts TXT or PDF documents, preprocesses and segments them, predicts) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 436 Tm (rhetorical roles, generates multiple abstractive summary candidates, reranks them with) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 422 Tm (argument-aware scoring, and returns the best summary with metrics and interpretable) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 408 Tm (reasoning.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 391 Tm (The project is inspired by the ACL 2023 paper on argument-aware abstractive summarization) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 377 Tm (with summary reranking, but it is implemented as a practical local-first engineering system) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 363 Tm (rather than a one-to-one reproduction of the paper's exact experimental setup.) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 346 Tm (Core Problem Statement) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 322 Tm (Legal opinions are difficult to summarize because:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 305 Tm (- they are long and often exceed the context length of standard models) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 289 Tm (- key information is distributed across facts, issue, arguments, analysis, statutes, and) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 275 Tm (ruling) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 259 Tm (- legal usefulness depends not only on fluency but also on preserving the court's) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 245 Tm (reasoning path) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 229 Tm (- citations, section headers, numbers, and procedural history can matter a lot) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 213 Tm (A plain summarizer may produce readable text but still miss the most important legal) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 199 Tm (structure. This system tries to solve that by making summary selection aware of rhetorical) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 185 Tm (and argumentative content.) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 168 Tm (High-Level System Architecture) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 144 Tm (The high-level flow is:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 127 Tm (- Input ingestion) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 111 Tm (- Text preprocessing and segmentation) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 95 Tm (- Rhetorical-role prediction) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 79 Tm (- Multi-candidate summary generation) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 63 Tm (- Role-aware reranking) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 1) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 4567 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 788 Tm (- Evaluation and explainability) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 772 Tm (- Delivery through API and Streamlit UI) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 756 Tm (In simple form:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 739 Tm (TXT/PDF -> Loader -> DataProcessor -> RoleClassifier -> SummaryGenerator -> SummaryReranker) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 725 Tm (-> Evaluator -> API/UI) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 708 Tm (End-To-End Pipeline Steps) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 684 Tm (Step 1: Input Loading) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 664 Tm (The system accepts:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 647 Tm (- plain text files) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 631 Tm (- PDF files) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 615 Tm (- dataset records from JSON, JSONL, or CSV) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 599 Tm (- direct pasted text from the Streamlit UI or API) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 583 Tm (TXT files are read directly. PDF files are parsed using pdfplumber first and pypdf as a) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 569 Tm (fallback.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 552 Tm (Main file: src/data/loader.py) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 535 Tm (Step 2: Text Normalization) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 515 Tm (The raw text is cleaned so later components receive a more stable input. The preprocessing) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 501 Tm (includes:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 484 Tm (- whitespace cleanup) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 468 Tm (- legal citation cleanup) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 452 Tm (- section header normalization) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 436 Tm (- quote and punctuation repair where possible) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 420 Tm (- encoding cleanup) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 404 Tm (Main file: src/data/preprocessing.py) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 387 Tm (Step 3: Paragraph Segmentation) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 367 Tm (The normalized document is split into paragraph-level segments. Each segment keeps mapping) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 353 Tm (information such as offsets or identifiers so the system can later show supporting source) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 339 Tm (text for explainability.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 322 Tm (Why it matters:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 305 Tm (- preserves original discourse structure) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 289 Tm (- makes long documents easier to inspect) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 273 Tm (- helps chunking and source attribution) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 257 Tm (Step 4: Sentence Segmentation) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 237 Tm (Each paragraph is split into sentence-level units. The code uses sentence splitting) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 223 Tm (utilities from src/utils.py and preprocessing logic in src/data/preprocessing.py.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 206 Tm (Why it matters:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 189 Tm (- role labeling often works better on sentence-sized units) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 173 Tm (- candidate generation strategies may select role-focused sentences) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 157 Tm (- evaluation and explainability become easier) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 141 Tm (Step 5: Rhetorical-Unit Segmentation) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 121 Tm (The system approximates rhetorical or argumentative units. In practice, this is a) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 107 Tm (lightweight engineering approximation built on top of sentence structure and legal cue) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 93 Tm (phrases rather than a full discourse parser.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 76 Tm (Why it matters:) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 2) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 4229 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 788 Tm (- finer-grained units provide better role labeling than whole paragraphs) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 772 Tm (- allows the reranker to reason about structure at a more useful granularity) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 756 Tm (Step 6: Chunking For Long Documents) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 736 Tm (Long judgments are split into overlapping chunks.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 719 Tm (Current config values from configs/model_config.yaml:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 702 Tm (- chunk_max_words: 850) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 686 Tm (- chunk_overlap_words: 120) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 670 Tm (How it works:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 653 Tm (- the system collects sentence or rhetorical-unit text into a chunk until it approaches) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 639 Tm (the maximum word budget) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 623 Tm (- when a new chunk starts, part of the previous chunk is repeated as overlap) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 607 Tm (Why overlap is used:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 590 Tm (- avoids losing context at chunk boundaries) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 574 Tm (- helps preserve reasoning continuity) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 558 Tm (- improves long-document summarization stability) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 542 Tm (Main file: src/data/chunking.py) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 525 Tm (Step 7: Rhetorical-Role Prediction) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 505 Tm (Each rhetorical unit is assigned a role label.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 488 Tm (Current label set:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 471 Tm (- facts) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 455 Tm (- issue) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 439 Tm (- arguments) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 423 Tm (- analysis) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 407 Tm (- ruling) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 391 Tm (- statute) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 375 Tm (- other) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 359 Tm (The classifier returns:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 342 Tm (- predicted label) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 326 Tm (- confidence score) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 310 Tm (- optional top-k probabilities) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 294 Tm (- optional rationale metadata) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 278 Tm (Main files:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 261 Tm (- src/roles/classifier.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 245 Tm (- src/roles/heuristics.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 229 Tm (- src/roles/labels.py) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 213 Tm (Step 8: Candidate Summary Generation) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 193 Tm (The system does not trust a single generated summary. It creates several candidates for the) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 179 Tm (same source document using different strategies.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 162 Tm (Main file: src/summarization/generator.py) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 145 Tm (Step 9: Candidate Reranking) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 125 Tm (All candidate summaries are scored, compared, and ranked. The highest-scoring summary) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 111 Tm (becomes the final output.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 94 Tm (Main file: src/reranking/reranker.py) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 77 Tm (Step 10: Evaluation) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 3) Tj ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 4460 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 788 Tm (If a gold summary is available, the selected summary is evaluated automatically using ROUGE) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 774 Tm (and BERTScore.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 757 Tm (Main file: src/evaluation/evaluator.py) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 740 Tm (Step 11: Delivery And Explainability) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 720 Tm (The selected summary, metrics, reranking scores, and supporting segments are returned) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 706 Tm (through:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 689 Tm (- the FastAPI backend) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 673 Tm (- the Streamlit frontend) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 657 Tm (- exports such as Markdown, JSON, and optional PDF) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 641 Tm (Main files:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 624 Tm (- app/api.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 608 Tm (- app/streamlit_app.py) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 592 Tm (Models Used In The Project) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 568 Tm (Summarization Models) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 548 Tm (Configured in configs/model_config.yaml:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 531 Tm (- preferred: allenai/led-base-16384) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 515 Tm (- fallback: facebook/bart-large-cnn) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 499 Tm (- lightweight fallback: google/flan-t5-base) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 483 Tm (Why these are used:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 466 Tm (- LED is a long-context summarization model and is the best fit for long legal documents) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 450 Tm (- BART provides a strong general fallback) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 434 Tm (- FLAN-T5 is useful as a lighter fallback when resources are limited) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 418 Tm (Role Classification Models) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 398 Tm (Configured in configs/model_config.yaml:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 381 Tm (- preferred: law-ai/InLegalBERT) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 365 Tm (- alternative: nlpaueb/legal-bert-base-uncased) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 349 Tm (- lightweight fallback: distilbert-base-uncased) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 333 Tm (Why these are used:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 316 Tm (- InLegalBERT and Legal-BERT are domain-specific legal encoders) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 300 Tm (- DistilBERT gives a lightweight emergency path) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 284 Tm (Embedding Model For Reranking) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 264 Tm (- sentence-transformers/all-MiniLM-L6-v2) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 248 Tm (Why it is used:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 231 Tm (- produces sentence/document embeddings efficiently) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 215 Tm (- supports semantic similarity scoring for source-summary comparison) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 199 Tm (Do We Have A Custom Trained Model?) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 179 Tm (The codebase supports training a role classifier, but no custom fine-tuned checkpoint is) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 165 Tm (bundled by default. The system works with pretrained open-source models plus heuristic) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 151 Tm (fallbacks.) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 134 Tm (Candidate Generation Strategies) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 110 Tm (Configured in configs/app_config.yaml:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 93 Tm (- baseline_full_document) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 77 Tm (- role_focus_facts_issue_ruling) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 61 Tm (- analysis_heavy) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 4) Tj ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 4037 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 788 Tm (- chunk_merge_conservative) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 772 Tm (- chunk_merge_diverse) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 756 Tm (1. baseline_full_document) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 736 Tm (Uses the whole normalized document as input to produce a broad summary.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 719 Tm (Use case:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 702 Tm (- balanced, general legal summary) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 686 Tm (2. role_focus_facts_issue_ruling) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 666 Tm (Constructs a role-aware input emphasizing:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 649 Tm (- facts) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 633 Tm (- issue) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 617 Tm (- ruling) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 601 Tm (Use case:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 584 Tm (- concise case brief style summary) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 568 Tm (- useful when the outcome and core question matter most) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 552 Tm (3. analysis_heavy) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 532 Tm (Gives more attention to analysis and reasoning-heavy segments.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 515 Tm (Use case:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 498 Tm (- legal reasoning summary) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 482 Tm (- useful when the court's logic matters more than background detail) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 466 Tm (4. chunk_merge_conservative) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 446 Tm (Summarizes chunk by chunk and merges the results with safer decoding settings.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 429 Tm (Use case:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 412 Tm (- more stable generation) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 396 Tm (- less diverse but usually more controlled output) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 380 Tm (5. chunk_merge_diverse) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 360 Tm (Uses a chunk-and-merge strategy with more varied decoding.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 343 Tm (Use case:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 326 Tm (- generates a more diverse alternative candidate) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 310 Tm (- useful for reranking because diversity gives the selector better options) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 294 Tm (Each candidate stores:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 277 Tm (- candidate text) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 261 Tm (- generation method) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 245 Tm (- decoding parameters) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 229 Tm (- source chunks used) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 213 Tm (Reranking: Scores, Formula, And Meaning) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 189 Tm (The reranker combines multiple signals into a final score.) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 172 Tm (Current weights from configs/scoring_config.yaml:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 155 Tm (- semantic_similarity: 0.38) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 139 Tm (- role_coverage: 0.26) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 123 Tm (- factual_proxy: 0.20) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 107 Tm (- readability_bonus: 0.08) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 91 Tm (- redundancy_penalty: 1.0) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 75 Tm (- length_penalty: 1.0) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 5) Tj ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Length 4199 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 788 Tm (Practical Formula) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 768 Tm (The effective logic is:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 751 Tm (final_score = 0.38semantic_similarity + 0.26role_coverage + 0.20factual_proxy +) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 737 Tm (0.08readability_bonus - redundancy_penalty - length_penalty) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 720 Tm (Score Components) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 700 Tm (semantic_similarity) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 683 Tm (What it means:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 666 Tm (- how well the candidate summary matches the meaning of the full source document) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 650 Tm (How it is computed:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 633 Tm (- embedding-based similarity using sentence-transformer embeddings) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 617 Tm (- fallback methods may be used if the embedding backend is unavailable) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 601 Tm (Why it matters:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 584 Tm (- prevents fluent but off-topic summaries) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 568 Tm (role_coverage) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 551 Tm (What it means:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 534 Tm (- how well the candidate covers important rhetorical roles in the legal opinion) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 518 Tm (How it is computed:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 501 Tm (- compares source-role distribution and summary-role coverage heuristics) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 485 Tm (- uses role importance weights) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 469 Tm (Current role importance values:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 452 Tm (- facts: 0.14) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 436 Tm (- issue: 0.14) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 420 Tm (- arguments: 0.14) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 404 Tm (- analysis: 0.20) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 388 Tm (- ruling: 0.24) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 372 Tm (- statute: 0.10) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 356 Tm (- other: 0.04) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 340 Tm (Why it matters:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 323 Tm (- makes the system argument-aware instead of fluency-only) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 307 Tm (- especially rewards analysis and ruling coverage) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 291 Tm (factual_proxy) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 274 Tm (What it means:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 257 Tm (- a practical proxy for factual consistency) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 241 Tm (How it is computed:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 224 Tm (- overlap of numbers, legal references, citations, and other support signals) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 208 Tm (Why it matters:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 191 Tm (- helps reduce factual drift without requiring a full factuality verifier) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 175 Tm (redundancy_penalty) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 158 Tm (What it means:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 141 Tm (- penalty for repeated sentences or repeated n-grams) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 125 Tm (Current threshold:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 108 Tm (- redundancy_ngram_size: 3) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 92 Tm (Why it matters:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 75 Tm (- stops the model from padding with repetitive text) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 6) Tj ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 16 0 R >>
+endobj
+18 0 obj
+<< /Length 3887 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 788 Tm (length_penalty) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 771 Tm (What it means:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 754 Tm (- penalty for summaries that are too short or too long) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 738 Tm (Current thresholds:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 721 Tm (- minimum words: 90) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 705 Tm (- maximum words: 260) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 689 Tm (- ideal words: 170) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 673 Tm (Why it matters:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 656 Tm (- keeps the summary useful and proportionate) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 640 Tm (readability_bonus) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 623 Tm (What it means:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 606 Tm (- reward for sentence-length patterns that stay in a readable range) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 590 Tm (Current thresholds:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 573 Tm (- minimum readable sentence length: 10) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 557 Tm (- maximum readable sentence length: 32) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 541 Tm (Why it matters:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 524 Tm (- discourages dense, unreadable output) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 508 Tm (Evaluation Metrics) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 484 Tm (The evaluator computes both lexical and semantic metrics.) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 467 Tm (ROUGE-1) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 447 Tm (Definition:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 430 Tm (- unigram overlap between generated summary and reference summary) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 414 Tm (Why it matters:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 397 Tm (- checks whether important content words are covered) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 381 Tm (ROUGE-2) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 361 Tm (Definition:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 344 Tm (- bigram overlap between generated summary and reference summary) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 328 Tm (Why it matters:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 311 Tm (- stronger than unigram overlap because it cares about short phrase structure) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 295 Tm (ROUGE-L) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 275 Tm (Definition:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 258 Tm (- based on longest common subsequence overlap) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 242 Tm (Why it matters:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 225 Tm (- rewards sequence-level similarity without requiring exact word-by-word identity) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 209 Tm (BERTScore) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 189 Tm (Definition:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 172 Tm (- semantic similarity using contextual embeddings) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 156 Tm (Key outputs:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 139 Tm (- Precision) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 123 Tm (- Recall) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 107 Tm (- F1) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 91 Tm (Why it matters:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 74 Tm (- legal summaries often paraphrase rather than copy) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 7) Tj ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 18 0 R >>
+endobj
+20 0 obj
+<< /Length 3892 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 788 Tm (- BERTScore is better than pure lexical metrics in those cases) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 772 Tm (Main Classes And What They Do) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 748 Tm (DataProcessor) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 728 Tm (Main file:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 711 Tm (- src/data/preprocessing.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 695 Tm (Responsibilities:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 678 Tm (- normalize legal text) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 662 Tm (- segment paragraphs) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 646 Tm (- segment sentences) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 630 Tm (- approximate rhetorical units) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 614 Tm (- build long-document chunks) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 598 Tm (- preserve mapping information for explainability) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 582 Tm (RoleClassifier) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 562 Tm (Main file:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 545 Tm (- src/roles/classifier.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 529 Tm (Responsibilities:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 512 Tm (- predict rhetorical roles for one segment or many segments) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 496 Tm (- use transformer-backed inference when possible) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 480 Tm (- fall back to heuristics if needed) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 464 Tm (SummaryGenerator) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 444 Tm (Main file:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 427 Tm (- src/summarization/generator.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 411 Tm (Responsibilities:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 394 Tm (- create multiple abstractive summary candidates) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 378 Tm (- choose between LED, BART, FLAN-T5, or fallback logic) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 362 Tm (- support chunk-aware and role-aware generation strategies) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 346 Tm (SummaryReranker) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 326 Tm (Main file:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 309 Tm (- src/reranking/reranker.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 293 Tm (Responsibilities:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 276 Tm (- score candidates) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 260 Tm (- compute semantic similarity, role coverage, factual proxy, redundancy, length, and) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 246 Tm (readability values) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 230 Tm (- return ranked candidates and reasoning metadata) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 214 Tm (Evaluator) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 194 Tm (Main file:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 177 Tm (- src/evaluation/evaluator.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 161 Tm (Responsibilities:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 144 Tm (- compute ROUGE) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 128 Tm (- compute BERTScore) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 112 Tm (- generate qualitative analysis and exportable metrics) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 96 Tm (LegalSummarizationPipeline) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 76 Tm (Main file:) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 8) Tj ET
+endstream
+endobj
+21 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 20 0 R >>
+endobj
+22 0 obj
+<< /Length 3802 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 788 Tm (- src/pipeline/summarization_pipeline.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 772 Tm (Responsibilities:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 755 Tm (- orchestrate the full process from input text to final result) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 739 Tm (- manage progress callbacks for the UI) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 723 Tm (- coordinate preprocessing, role prediction, generation, reranking, and evaluation) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 707 Tm (Technologies And Libraries Used) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 683 Tm (Python) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 663 Tm (Used as the main language for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 646 Tm (- pipeline implementation) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 630 Tm (- APIs) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 614 Tm (- UI) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 598 Tm (- training scripts) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 582 Tm (- evaluation scripts) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 566 Tm (PyTorch) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 546 Tm (Used for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 529 Tm (- loading and running transformer models) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 513 Tm (- CPU or device-aware inference) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 497 Tm (Hugging Face Transformers) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 477 Tm (Used for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 460 Tm (- summarization model loading) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 444 Tm (- role classification model loading) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 428 Tm (- tokenizer/model abstractions) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 412 Tm (sentence-transformers) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 392 Tm (Used for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 375 Tm (- embedding-based semantic similarity) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 359 Tm (- reranking support) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 343 Tm (datasets) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 323 Tm (Used for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 306 Tm (- training data preparation and model fine-tuning workflows) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 290 Tm (scikit-learn) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 270 Tm (Used for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 253 Tm (- utility functions in training/evaluation and lightweight fallbacks) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 237 Tm (FastAPI) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 217 Tm (Used for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 200 Tm (- backend API endpoints) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 184 Tm (- request/response serving) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 168 Tm (Streamlit) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 148 Tm (Used for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 131 Tm (- local interactive UI) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 115 Tm (- file upload, text entry, progress display, exports, and auth-driven workspace) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 99 Tm (pdfplumber and pypdf) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 79 Tm (Used for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 62 Tm (- text extraction from PDF judgments and opinions) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 9) Tj ET
+endstream
+endobj
+23 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 22 0 R >>
+endobj
+24 0 obj
+<< /Length 3623 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 788 Tm (Pydantic) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 768 Tm (Used for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 751 Tm (- config models) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 735 Tm (- API schemas) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 719 Tm (PyYAML) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 699 Tm (Used for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 682 Tm (- YAML config loading) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 666 Tm (rouge-score and bert-score) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 646 Tm (Used for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 629 Tm (- evaluation metrics) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 613 Tm (reportlab) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 593 Tm (Used for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 576 Tm (- PDF report generation in the app) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 560 Tm (- PDF generation utilities such as this handbook builder) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 544 Tm (pytest) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 524 Tm (Used for:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 507 Tm (- automated tests across the pipeline and app) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 491 Tm (API And UI Summary) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 467 Tm (FastAPI Endpoints) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 447 Tm (Implemented in app/api.py:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 430 Tm (- GET /health) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 414 Tm (- POST /upload-pdf) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 398 Tm (- POST /summarize) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 382 Tm (- POST /evaluate) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 366 Tm (Streamlit UI) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 346 Tm (Implemented in app/streamlit_app.py:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 329 Tm (- local login and registration) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 313 Tm (- persistent session support across refresh) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 297 Tm (- TXT/PDF input) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 281 Tm (- live pipeline status board) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 265 Tm (- final summary display) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 249 Tm (- metrics) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 233 Tm (- exports) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 217 Tm (File-By-File Guide) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 193 Tm (This section explains the responsibility of the important files in the repository.) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 176 Tm (Root Files) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 156 Tm (.env.example) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 139 Tm (Template for environment variables and runtime toggles.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 122 Tm (.gitignore) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 105 Tm (Prevents virtual environments, caches, logs, and generated artifacts from being committed.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 88 Tm (Dockerfile) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 71 Tm (Container definition for packaging and running the application.) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 10) Tj ET
+endstream
+endobj
+25 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 24 0 R >>
+endobj
+26 0 obj
+<< /Length 3794 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 788 Tm (README.md) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 771 Tm (Primary project documentation covering overview, setup, architecture, usage, limitations,) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 757 Tm (and paper alignment.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 740 Tm (requirements.txt) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 723 Tm (Dependency list for the project.) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 706 Tm (Streamlit Runtime Config) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 686 Tm (.streamlit/config.toml) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 669 Tm (Local Streamlit runtime configuration file.) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 652 Tm (App Layer) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 632 Tm (app/__init__.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 615 Tm (Marks app as a Python package.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 598 Tm (app/api.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 581 Tm (FastAPI application entrypoint with the health, upload, summarize, and evaluate endpoints.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 564 Tm (app/schemas.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 547 Tm (Pydantic request and response schemas for the API.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 530 Tm (app/streamlit_app.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 513 Tm (Main Streamlit UI:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 496 Tm (- sign-in flow) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 480 Tm (- persistent sessions) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 464 Tm (- file intake) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 448 Tm (- pipeline progress board) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 432 Tm (- summary display) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 416 Tm (- export actions) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 400 Tm (Config Files) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 380 Tm (configs/app_config.yaml) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 363 Tm (Application-level config:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 346 Tm (- API title and port) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 330 Tm (- UI layout) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 314 Tm (- auth settings) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 298 Tm (- generation strategies) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 282 Tm (- explainability settings) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 266 Tm (configs/model_config.yaml) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 249 Tm (Model/runtime config:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 232 Tm (- device) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 216 Tm (- heuristics-only flags) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 200 Tm (- summarization models) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 184 Tm (- role models) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 168 Tm (- embeddings model) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 152 Tm (- training hyperparameters) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 136 Tm (configs/scoring_config.yaml) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 119 Tm (Reranking and length/readability config:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 102 Tm (- metric weights) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 86 Tm (- role importance) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 70 Tm (- thresholds) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 11) Tj ET
+endstream
+endobj
+27 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 26 0 R >>
+endobj
+28 0 obj
+<< /Length 4276 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 788 Tm (Demo And Sample Data) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 768 Tm (data/demo/indian_judgment_sample.txt) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 751 Tm (Sample Indian judgment text used for demos.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 734 Tm (data/demo/us_opinion_sample.txt) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 717 Tm (Sample U.S. legal opinion text used for demos.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 700 Tm (data/demo/README.md) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 683 Tm (Notes about demo data usage.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 666 Tm (data/samples/legal_samples.csv) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 649 Tm (Small sample dataset for experiments, preprocessing, or evaluation.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 632 Tm (data/samples/legal_samples.json) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 615 Tm (JSON version of the small sample dataset.) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 598 Tm (Processed Runtime Artifacts) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 578 Tm (data/processed/.gitkeep) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 561 Tm (Keeps the processed folder in version control.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 544 Tm (data/processed/app_users.db) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 527 Tm (Local SQLite auth database used by the Streamlit app.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 510 Tm (data/processed/demo_result_india.json) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 493 Tm (Saved demo pipeline output for an Indian sample.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 476 Tm (data/processed/demo_result_model_stack.json) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 459 Tm (Saved demo output from a model-backed run.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 442 Tm (data/processed/streamlit_*.log) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 425 Tm (Runtime log files produced during local Streamlit runs. These are operational artifacts, not) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 411 Tm (core source files.) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 394 Tm (Notebook) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 374 Tm (notebooks/exploratory_experiments.ipynb) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 357 Tm (Notebook for quick experimentation with loading, preprocessing, generation, reranking, and) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 343 Tm (evaluation.) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 326 Tm (Scripts) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 306 Tm (scripts/build_presentation.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 289 Tm (Builds the project presentation deck.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 272 Tm (scripts/evaluate_model.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 255 Tm (Runs batch evaluation and exports metrics.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 238 Tm (scripts/preprocess_data.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 221 Tm (Preprocesses input datasets into segmented output.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 204 Tm (scripts/run_demo.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 187 Tm (Runs the end-to-end pipeline on a sample input file.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 170 Tm (scripts/train_role_classifier.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 153 Tm (Fine-tunes a rhetorical-role classifier when labeled or weak-labeled data is available.) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 136 Tm (Core Source Package) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 116 Tm (src/__init__.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 99 Tm (Marks src as a Python package.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 82 Tm (src/config.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 65 Tm (Loads YAML configuration and defines typed config models with Pydantic.) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 12) Tj ET
+endstream
+endobj
+29 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 28 0 R >>
+endobj
+30 0 obj
+<< /Length 3691 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 788 Tm (src/logger.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 771 Tm (Shared logging setup.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 754 Tm (src/utils.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 737 Tm (Shared data structures and helpers such as:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 720 Tm (- document record containers) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 704 Tm (- segment containers) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 688 Tm (- candidate score containers) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 672 Tm (- evaluation metric containers) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 656 Tm (- text and similarity helpers) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 640 Tm (Auth Package) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 620 Tm (src/auth/__init__.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 603 Tm (Exports auth classes.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 586 Tm (src/auth/service.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 569 Tm (Local authentication and session service:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 552 Tm (- user registration) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 536 Tm (- password hashing) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 520 Tm (- login verification) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 504 Tm (- persistent session creation and revocation) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 488 Tm (- SQLite-backed account store) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 472 Tm (Data Package) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 452 Tm (src/data/__init__.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 435 Tm (Package marker for data utilities.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 418 Tm (src/data/chunking.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 401 Tm (Chunk-building logic for long documents.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 384 Tm (src/data/loader.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 367 Tm (File and dataset loading:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 350 Tm (- TXT) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 334 Tm (- PDF) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 318 Tm (- CSV) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 302 Tm (- JSON) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 286 Tm (- JSONL) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 270 Tm (src/data/preprocessing.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 253 Tm (Main data processing logic:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 236 Tm (- normalization) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 220 Tm (- segmentation) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 204 Tm (- rhetorical-unit approximation) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 188 Tm (- progress callbacks) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 172 Tm (Evaluation Package) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 152 Tm (src/evaluation/__init__.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 135 Tm (Package marker for evaluation utilities.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 118 Tm (src/evaluation/evaluator.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 101 Tm (Implements:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 84 Tm (- ROUGE) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 68 Tm (- BERTScore) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 13) Tj ET
+endstream
+endobj
+31 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 30 0 R >>
+endobj
+32 0 obj
+<< /Length 4118 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 788 Tm (- qualitative analysis) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 772 Tm (- export-friendly evaluation structures) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 756 Tm (Pipeline Package) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 736 Tm (src/pipeline/__init__.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 719 Tm (Package marker for pipeline utilities.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 702 Tm (src/pipeline/summarization_pipeline.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 685 Tm (Main orchestrator that binds together loader, preprocessing, classifier, generator,) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 671 Tm (reranker, and evaluator.) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 654 Tm (Reranking Package) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 634 Tm (src/reranking/__init__.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 617 Tm (Package marker for reranking utilities.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 600 Tm (src/reranking/reranker.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 583 Tm (Candidate scoring and ranking logic.) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 566 Tm (Roles Package) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 546 Tm (src/roles/__init__.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 529 Tm (Package marker for role classification utilities.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 512 Tm (src/roles/classifier.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 495 Tm (Role prediction using transformer-backed or heuristic-supported logic.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 478 Tm (src/roles/heuristics.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 461 Tm (Weak-labeling and fallback rule system using legal cue phrases, headers, regex, and keyword) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 447 Tm (dictionaries.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 430 Tm (src/roles/labels.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 413 Tm (Role labels, role descriptions, and role-priority metadata.) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 396 Tm (Summarization Package) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 376 Tm (src/summarization/__init__.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 359 Tm (Package marker for summarization utilities.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 342 Tm (src/summarization/candidates.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 325 Tm (Candidate summary construction helpers.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 308 Tm (src/summarization/generator.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 291 Tm (Main summary generation engine:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 274 Tm (- model loading) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 258 Tm (- fallback logic) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 242 Tm (- role-aware input variants) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 226 Tm (- chunk-and-merge strategies) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 210 Tm (src/summarization/prompts.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 193 Tm (Role-aware prompt and input-construction helpers used during candidate generation.) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 176 Tm (Tests) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 156 Tm (tests/conftest.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 139 Tm (Pytest fixtures and test pipeline config.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 122 Tm (tests/test_api.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 105 Tm (Tests API endpoint behavior.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 88 Tm (tests/test_auth.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 71 Tm (Tests registration, authentication, and persistent-session behavior.) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 14) Tj ET
+endstream
+endobj
+33 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 32 0 R >>
+endobj
+34 0 obj
+<< /Length 4363 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 788 Tm (tests/test_generator.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 771 Tm (Tests candidate generation behavior.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 754 Tm (tests/test_loader.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 737 Tm (Tests TXT/PDF/dataset loading behavior.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 720 Tm (tests/test_preprocessing.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 703 Tm (Tests normalization and segmentation behavior.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 686 Tm (tests/test_reranker.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 669 Tm (Tests reranking and score logic.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 652 Tm (tests/test_roles.py) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 635 Tm (Tests rhetorical-role prediction behavior.) Tj ET
+BT /F2 13 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 618 Tm (Docs) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 598 Tm (docs/legal_argument_aware_summarization_mvp_presentation.pptx) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 581 Tm (Project presentation deck.) Tj ET
+BT /F2 11 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 564 Tm (docs/legal_argument_aware_summarization_mvp_presentation_notes.md) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 547 Tm (Speaker notes for the presentation deck.) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 530 Tm (What Is Faithful To The Research Idea) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 506 Tm (The code is faithful to the following high-level ideas from the source paper:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 489 Tm (- long legal opinions need structure-aware handling) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 473 Tm (- multiple candidate summaries are better than blindly trusting a single decode) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 457 Tm (- reranking should use argument or rhetorical information) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 441 Tm (- long-document chunking is important) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 425 Tm (What Is A Pragmatic Engineering Adaptation) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 401 Tm (The following are MVP-oriented engineering decisions:) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 384 Tm (- hybrid role classification rather than an exact paper-specific supervised pipeline) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 368 Tm (- practical faithfulness proxies instead of a research-only scoring function) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 352 Tm (- local-first UI, API, exports, auth, scripts, tests, and Docker support) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 336 Tm (- CPU-safe fallback behavior) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 320 Tm (Current Strengths) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 296 Tm (- realistic runnable architecture) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 280 Tm (- open-source-only model stack) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 264 Tm (- fallback path when large models are unavailable) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 248 Tm (- modular codebase) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 232 Tm (- explainability support) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 216 Tm (- API plus UI) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 200 Tm (- testing and configuration support) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 184 Tm (Current Limitations) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 160 Tm (- not an exact paper replication) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 144 Tm (- LED and other large models can be slow on CPU) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 128 Tm (- role quality improves when a dedicated fine-tuned checkpoint is available) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 112 Tm (- PDF quality depends on source formatting) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 96 Tm (Best Next Improvements) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 72 Tm (- train a stronger rhetorical-role classifier on richer legal annotations) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 15) Tj ET
+endstream
+endobj
+35 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 34 0 R >>
+endobj
+36 0 obj
+<< /Length 1090 >>
+stream
+0.12 0.18 0.25 RG
+52 812 m 543 812 l S
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 788 Tm (- add stronger legal factuality and citation-grounding checks) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 772 Tm (- benchmark on larger legal summarization datasets) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 756 Tm (- improve PDF layout understanding) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 60 740 Tm (- add richer jurisdiction-specific rules) Tj ET
+BT /F2 16 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 724 Tm (One-Sentence Summary) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 700 Tm (This project reads a long legal document, understands its rhetorical structure, generates) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 686 Tm (several abstractive summaries, reranks them with argument-aware scoring, and returns the) Tj ET
+BT /F1 10 Tf 0.12 0.16 0.22 rg 1 0 0 1 52 672 Tm (best summary with evidence and metrics.) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 52 18 Tm (Legal Argument-Aware Summarization MVP Handbook) Tj ET
+BT /F1 9 Tf 0.37 0.42 0.48 rg 1 0 0 1 505 18 Tm (Page 16) Tj ET
+endstream
+endobj
+37 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 36 0 R >>
+endobj
+xref
+0 38
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000228 00000 n 
+0000000298 00000 n 
+0000000373 00000 n 
+0000000441 00000 n 
+0000005340 00000 n 
+0000005486 00000 n 
+0000010105 00000 n 
+0000010251 00000 n 
+0000014533 00000 n 
+0000014681 00000 n 
+0000019194 00000 n 
+0000019342 00000 n 
+0000023432 00000 n 
+0000023580 00000 n 
+0000027832 00000 n 
+0000027980 00000 n 
+0000031920 00000 n 
+0000032068 00000 n 
+0000036013 00000 n 
+0000036161 00000 n 
+0000040016 00000 n 
+0000040164 00000 n 
+0000043840 00000 n 
+0000043988 00000 n 
+0000047835 00000 n 
+0000047983 00000 n 
+0000052312 00000 n 
+0000052460 00000 n 
+0000056204 00000 n 
+0000056352 00000 n 
+0000060523 00000 n 
+0000060671 00000 n 
+0000065087 00000 n 
+0000065235 00000 n 
+0000066378 00000 n 
+trailer
+<< /Size 38 /Root 1 0 R >>
+startxref
+66526
+%%EOF

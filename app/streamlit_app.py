@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from src.auth import AuthService, AuthValidationError
 from src.pipeline.summarization_pipeline import LegalSummarizationPipeline
@@ -53,6 +54,9 @@ def get_services() -> tuple[LegalSummarizationPipeline, AuthService]:
 def initialize_state() -> None:
     defaults = {
         "auth_user": None,
+        "auth_session_token": None,
+        "pending_auth_cookie": None,
+        "clear_auth_cookie": False,
         "latest_result": None,
         "latest_markdown_report": "",
         "document_editor": "",
@@ -188,8 +192,64 @@ def reset_workspace() -> None:
     st.session_state["latest_markdown_report"] = ""
 
 
-def sign_out() -> None:
+def _cookie_script(cookie_name: str, token: Optional[str], max_age_seconds: int) -> str:
+    if token:
+        cookie_assignment = (
+            f"{cookie_name}={token}; path=/; max-age={max_age_seconds}; SameSite=Lax"
+        )
+    else:
+        cookie_assignment = f"{cookie_name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; SameSite=Lax"
+    return f"""
+    <script>
+    document.cookie = {json.dumps(cookie_assignment)};
+    </script>
+    """
+
+
+def render_auth_cookie_bridge(cookie_name: str, duration_days: int) -> None:
+    pending_token = st.session_state.get("pending_auth_cookie")
+    should_clear = st.session_state.get("clear_auth_cookie", False)
+    if pending_token is None and not should_clear:
+        return
+
+    max_age_seconds = max(duration_days, 1) * 24 * 60 * 60
+    components.html(
+        _cookie_script(cookie_name, None if should_clear else pending_token, max_age_seconds),
+        height=0,
+        width=0,
+    )
+    st.session_state["pending_auth_cookie"] = None
+    st.session_state["clear_auth_cookie"] = False
+
+
+def hydrate_auth_from_cookie(auth_service: AuthService, cookie_name: str) -> None:
+    if st.session_state.get("auth_user"):
+        if not st.session_state.get("auth_session_token"):
+            st.session_state["auth_session_token"] = st.context.cookies.get(cookie_name)
+        return
+
+    cookie_token = st.context.cookies.get(cookie_name)
+    if not cookie_token:
+        return
+
+    user = auth_service.get_user_by_session_token(cookie_token)
+    if user is None:
+        st.session_state["clear_auth_cookie"] = True
+        st.session_state["auth_session_token"] = None
+        return
+
+    st.session_state["auth_user"] = asdict(user)
+    st.session_state["auth_session_token"] = cookie_token
+
+
+def sign_out(auth_service: AuthService) -> None:
+    session_token = st.session_state.get("auth_session_token")
+    if session_token:
+        auth_service.revoke_session(session_token)
     st.session_state["auth_user"] = None
+    st.session_state["auth_session_token"] = None
+    st.session_state["pending_auth_cookie"] = None
+    st.session_state["clear_auth_cookie"] = True
     reset_workspace()
     st.rerun()
 
@@ -439,51 +499,11 @@ def run_pipeline_with_feedback(
     return result
 
 
-def render_auth_screen(auth_service: AuthService) -> None:
-    st.markdown(
-        """
-        <div class="hero-shell">
-            <h1>Counsel Desk</h1>
-            <p>
-                A research-grade legal summarization workspace for long judgments and opinions. Upload a document,
-                inspect its rhetorical structure, compare multiple abstractive candidates, and understand why the
-                selected summary won. Access is protected locally with salted password hashing.
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+def render_auth_screen(auth_service: AuthService, session_duration_days: int) -> None:
+    st.title("Legal Document Summarization")
+    st.caption("Sign in to upload a legal document, run the pipeline, and view the final summary.")
 
-    feature_col, auth_col = st.columns([1.05, 0.95], gap="large")
-    with feature_col:
-        st.markdown('<div class="glass-panel">', unsafe_allow_html=True)
-        st.markdown("### Built For Serious Legal Analysis")
-        st.markdown(
-            """
-            - Upload TXT or PDF opinions and preserve paragraph, sentence, and rhetorical-unit mappings.
-            - Watch chunking, role prediction, generation, and reranking progress as the pipeline runs.
-            - Export polished summaries to Markdown, JSON, and optionally PDF.
-            """
-        )
-        st.markdown(
-            """
-            <div class="auth-note">
-                <strong>Security note:</strong> accounts are stored only on this machine, and passwords are never
-                saved in plain text. They are salted and hashed with PBKDF2-HMAC-SHA256.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        feature_metrics = st.columns(3)
-        with feature_metrics[0]:
-            render_metric_card("Pipeline", "Live", "Stages update as analysis advances")
-        with feature_metrics[1]:
-            render_metric_card("Visual System", "Dark Mode", "Professional legal-tech workspace")
-        with feature_metrics[2]:
-            render_metric_card("Models", "Open Source", "Local-first Hugging Face support")
-
+    left_spacer, auth_col, right_spacer = st.columns([0.7, 1.1, 0.7], gap="large")
     with auth_col:
         st.markdown('<div class="auth-card">', unsafe_allow_html=True)
         auth_tabs = st.tabs(["Sign In", "Create Account"])
@@ -499,7 +519,10 @@ def render_auth_screen(auth_service: AuthService) -> None:
                     if user is None:
                         st.error("Email or password is incorrect.")
                     else:
+                        session_token = auth_service.create_session(user.user_id, duration_days=session_duration_days)
                         st.session_state["auth_user"] = asdict(user)
+                        st.session_state["auth_session_token"] = session_token
+                        st.session_state["pending_auth_cookie"] = session_token
                         st.rerun()
                 except AuthValidationError as error:
                     st.error(str(error))
@@ -517,7 +540,10 @@ def render_auth_screen(auth_service: AuthService) -> None:
                 else:
                     try:
                         user = auth_service.register_user(email=email, password=password, full_name=full_name)
+                        session_token = auth_service.create_session(user.user_id, duration_days=session_duration_days)
                         st.session_state["auth_user"] = asdict(user)
+                        st.session_state["auth_session_token"] = session_token
+                        st.session_state["pending_auth_cookie"] = session_token
                         st.rerun()
                     except AuthValidationError as error:
                         st.error(str(error))
@@ -538,38 +564,21 @@ def render_summary_panel(result: Dict[str, Any]) -> None:
 
 
 def render_primary_result_view(result: Dict[str, Any]) -> None:
-    runtime_info = result.get("runtime_info", {})
-    qualitative = result.get("qualitative_analysis", {})
     evaluation = result.get("evaluation")
-    candidates = result.get("generated_summary_candidates", [])
     scores = result.get("reranking_scores", [])
-    score_map = {score["candidate_id"]: score for score in scores}
-    best_score = score_map.get(result.get("best_candidate_id"), {})
+    best_score = next((score for score in scores if score["candidate_id"] == result.get("best_candidate_id")), {})
 
     summary_metrics = [
-        ("Best Candidate", result.get("best_candidate_id") or "-", "Top-ranked summary candidate"),
         ("Summary Words", str(len(result.get("best_summary", "").split())), "Length of the selected summary"),
-        ("Candidates", str(len(candidates)), "Generated before reranking"),
-        ("Reranker Score", f"{best_score.get('final_score', 0.0):.3f}", "Final weighted selection score"),
+        ("Reranker Score", f"{best_score.get('final_score', 0.0):.3f}", "Final selection score"),
+        ("Best Candidate", result.get("best_candidate_id") or "-", "Selected candidate"),
     ]
-    summary_metric_columns = st.columns(4)
+    summary_metric_columns = st.columns(3)
     for column, (label, value, subtext) in zip(summary_metric_columns, summary_metrics):
         with column:
             render_metric_card(label, value, subtext)
 
     render_summary_panel(result)
-
-    st.markdown('<div class="glass-panel">', unsafe_allow_html=True)
-    st.markdown('<div class="small-heading">Why This Summary Was Selected</div>', unsafe_allow_html=True)
-    reasons = qualitative.get("selection_explanation", [])
-    if reasons:
-        for reason in reasons:
-            st.write(f"- {reason}")
-    else:
-        st.caption("No additional reranking explanation was available for this run.")
-    if runtime_info:
-        render_backend_chips(runtime_info)
-    st.markdown("</div>", unsafe_allow_html=True)
 
     if evaluation:
         st.markdown('<div class="glass-panel">', unsafe_allow_html=True)
@@ -585,114 +594,10 @@ def render_primary_result_view(result: Dict[str, Any]) -> None:
             st.metric("BERTScore F1", f"{evaluation['bertscore_f1']:.3f}")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    supporting_segments = qualitative.get("key_legal_segments", [])
-    if supporting_segments:
-        with st.expander("View Supporting Legal Segments", expanded=False):
-            st.markdown("These source segments were most aligned with the selected summary.")
-            for segment in supporting_segments:
-                st.markdown(
-                    f"""
-                    <div class="candidate-box">
-                        <div><strong>{html.escape(segment['segment_id'])}</strong> | relevance {html.escape(str(segment['score']))}</div>
-                        <div style="margin-top:0.45rem;">{html.escape(segment['text'])}</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
 
-    with st.expander("View Other Summary Candidates", expanded=False):
-        comparison_rows = []
-        for candidate in candidates:
-            score = score_map.get(candidate["candidate_id"], {})
-            comparison_rows.append(
-                {
-                    "candidate_id": candidate["candidate_id"],
-                    "method": candidate["generation_method"],
-                    "final_score": round(score.get("final_score", 0.0), 4),
-                    "semantic_similarity": round(score.get("semantic_similarity", 0.0), 4),
-                    "role_coverage": round(score.get("role_coverage", 0.0), 4),
-                }
-            )
-        st.dataframe(comparison_rows, use_container_width=True)
-
-        for candidate in candidates:
-            if candidate["candidate_id"] == result.get("best_candidate_id"):
-                continue
-            score = score_map.get(candidate["candidate_id"], {})
-            with st.expander(
-                f"{candidate['candidate_id']} | {candidate['generation_method']} | score {score.get('final_score', 0.0):.3f}",
-                expanded=False,
-            ):
-                st.markdown(
-                    f"""
-                    <div class="candidate-box">
-                        <div class="small-heading">Candidate Summary</div>
-                        <div>{html.escape(candidate['text'])}</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-                reason_items = score.get("reasoning", [])
-                if reason_items:
-                    for reason in reason_items:
-                        st.write(f"- {reason}")
-
-    with st.expander("Advanced Analysis", expanded=False):
-        segmented = result.get("segmented_text", {})
-        top_row = st.columns(4)
-        advanced_metrics = [
-            ("Paragraphs", str(len(segmented.get("paragraphs", []))), "Normalized source sections"),
-            ("Sentences", str(len(segmented.get("sentences", []))), "Sentence-level segmentation"),
-            ("Rhetorical Units", str(len(segmented.get("rhetorical_units", []))), "Argument-aware units"),
-            ("Chunks", str(len(segmented.get("chunks", []))), "Long-context windows"),
-        ]
-        for column, (label, value, subtext) in zip(top_row, advanced_metrics):
-            with column:
-                render_metric_card(label, value, subtext)
-
-        role_predictions = result.get("predicted_roles", [])
-        if role_predictions:
-            available_roles = sorted({item["label"] for item in role_predictions})
-            selected_roles = st.multiselect(
-                "Filter rhetorical units by role",
-                available_roles,
-                default=available_roles,
-                key="advanced_role_filter",
-            )
-            role_badges = []
-            for role in selected_roles:
-                role_badges.append(
-                    f'<span class="role-pill" style="background:{ROLE_COLORS.get(role, "#7A7A7A")};">{html.escape(role.title())}</span>'
-                )
-            st.markdown("".join(role_badges), unsafe_allow_html=True)
-
-            unit_lookup = {segment["segment_id"]: segment for segment in segmented.get("rhetorical_units", [])}
-            filtered_rows = []
-            for prediction in role_predictions:
-                if prediction["label"] not in selected_roles:
-                    continue
-                segment = unit_lookup.get(prediction["segment_id"], {})
-                filtered_rows.append(
-                    {
-                        "segment_id": prediction["segment_id"],
-                        "role": prediction["label"],
-                        "confidence": round(prediction["confidence"], 3),
-                        "text": segment.get("text", ""),
-                        "rationale": " | ".join(prediction.get("rationale", [])),
-                    }
-                )
-            st.dataframe(filtered_rows, use_container_width=True, height=420)
-
-        candidate_comparison = qualitative.get("candidate_comparison", [])
-        if candidate_comparison:
-            st.markdown('<div class="small-heading">Candidate Comparison</div>', unsafe_allow_html=True)
-            st.dataframe(candidate_comparison, use_container_width=True)
-
-        st.markdown('<div class="small-heading">Raw Result JSON</div>', unsafe_allow_html=True)
-        st.json(result)
-
-
-def render_authenticated_workspace(pipeline: LegalSummarizationPipeline, auth_user: Dict[str, Any]) -> None:
+def render_authenticated_workspace(
+    pipeline: LegalSummarizationPipeline, auth_service: AuthService, auth_user: Dict[str, Any]
+) -> None:
     with st.sidebar:
         st.markdown(
             f"""
@@ -706,44 +611,24 @@ def render_authenticated_workspace(pipeline: LegalSummarizationPipeline, auth_us
         )
         st.write("")
         if st.button("Sign Out", use_container_width=True):
-            sign_out()
+            sign_out(auth_service)
 
-        st.subheader("Matter Intake")
+        st.subheader("Document Input")
         input_mode = st.radio("Input mode", ["Bundled demo", "Upload file", "Paste text"], index=0, key="input_mode")
         gold_summary = st.text_area("Optional gold summary", height=130, key="gold_summary_input")
-        run_clicked = st.button("Generate Summary Set", type="primary", use_container_width=True)
+        run_clicked = st.button("Generate Summary", type="primary", use_container_width=True)
         clear_clicked = st.button("Clear Current Result", use_container_width=True)
-        st.markdown(
-            """
-            <div class="workspace-note">
-                <strong>Workspace tone:</strong> dark, restrained, and research-facing.
-                The interface is designed to feel like a legal analysis desk with live system feedback.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
 
     if clear_clicked:
         reset_workspace()
         st.rerun()
 
-    st.markdown(
-        f"""
-        <div class="hero-shell">
-            <h1>Welcome back, {html.escape(auth_user.get('full_name', 'Counsel'))}</h1>
-            <p>
-                Ingest a legal opinion, watch the system segment and chunk it in real time, generate multiple
-                candidate summaries, and inspect why the reranker selected the final output.
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.title("Legal Document Summarization")
 
     input_col, status_col = st.columns([1.18, 0.82], gap="large")
     with input_col:
         st.markdown('<div class="glass-panel">', unsafe_allow_html=True)
-        st.markdown("### Case Intake")
+        st.markdown("### Document Input")
         if input_mode == "Bundled demo":
             demo_choice = st.selectbox("Choose a demo document", list(DEMO_FILES.keys()), key="demo_choice")
             if st.session_state["active_demo_choice"] != demo_choice:
@@ -783,16 +668,6 @@ def render_authenticated_workspace(pipeline: LegalSummarizationPipeline, auth_us
                 headline="Pipeline Ready",
                 status_text="Load a document and run the analysis to watch each stage advance.",
             )
-        st.markdown(
-            """
-            <div class="workspace-note" style="margin-top:0.9rem;">
-                <strong>Tip:</strong> the app can operate without a custom trained checkpoint. When full local
-                model weights are available, generation quality improves, but the workspace remains usable in
-                heuristic fallback mode.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
 
     if run_clicked:
         document_text = st.session_state.get("document_editor", "")
@@ -818,13 +693,6 @@ def render_authenticated_workspace(pipeline: LegalSummarizationPipeline, auth_us
     if not result:
         st.info("Load a document on the left and run the pipeline to begin.")
         return
-
-    runtime_info = result.get("runtime_info", {})
-    if runtime_info.get("summarization_backend") == "heuristic":
-        st.warning(
-            "This session is currently using heuristic fallback summarization. The workflow is fully functional, "
-            "but installing local Hugging Face runtime packages and model weights will improve generation quality."
-        )
 
     render_primary_result_view(result)
 
@@ -864,12 +732,16 @@ def main() -> None:
     pipeline, auth_service = get_services()
     initialize_state()
     inject_styles()
+    cookie_name = pipeline.config.app.auth.session_cookie_name
+    session_duration_days = pipeline.config.app.auth.session_duration_days
+    render_auth_cookie_bridge(cookie_name, session_duration_days)
+    hydrate_auth_from_cookie(auth_service, cookie_name)
 
     if pipeline.config.app.auth.enabled and not st.session_state.get("auth_user"):
-        render_auth_screen(auth_service)
+        render_auth_screen(auth_service, session_duration_days)
         return
 
-    render_authenticated_workspace(pipeline, st.session_state.get("auth_user") or {})
+    render_authenticated_workspace(pipeline, auth_service, st.session_state.get("auth_user") or {})
 
 
 if __name__ == "__main__":
